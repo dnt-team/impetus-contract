@@ -6,16 +6,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
-/**
- * Request testnet LINK and ETH here: https://faucets.chain.link/
- * Find information on LINK Token Contracts and get the latest ETH and LINK faucets here: https://docs.chain.link/docs/link-token-contracts/
- */
-
-/**
- * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
- * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
- * DO NOT USE THIS CODE IN PRODUCTION.
- */
 
 contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
     event RequestSent(uint256 requestId, uint32 numWords, uint256 block);
@@ -25,27 +15,24 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
     event ConfirmationUpdated(uint16 confirmation);
 
     struct RequestStatus {
-        bool fulfilled; // whether the request has been successfully fulfilled
-        bool exists; // whether a requestId exists
+        bool fulfilled;
+        bool exists;
         uint256[] randomWords;
     }
     mapping(uint256 => RequestStatus)
-        public s_requests; /* requestId --> requestStatus */
+        public s_requests;
     mapping(uint256 => uint256) public block_to_request_id;
     VRFCoordinatorV2Interface COORDINATOR;
 
-    // Your subscription ID.
     uint64 s_subscriptionId;
 
-    // past requests Id.
     uint256[] public requestIds;
     uint256 public lastRequestId;
 
     // The gas lane to use, which specifies the maximum gas price to bump to.
     // For a list of available gas lanes on each network,
     // see https://docs.chain.link/docs/vrf/v2/subscription/supported-networks/#configurations
-    bytes32 public keyHash =
-        0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
+    bytes32 public keyHash;
 
     // Depends on the number of requested values that you want sent to the
     // fulfillRandomWords() function. Storing each word costs about 20,000 gas,
@@ -66,10 +53,12 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
      */
     constructor(
         uint64 subscriptionId,
-        address coordinator
+        address coordinator,
+        bytes32 _keyHash
     ) VRFConsumerBaseV2(coordinator) ConfirmedOwner(msg.sender) {
         COORDINATOR = VRFCoordinatorV2Interface(coordinator);
         s_subscriptionId = subscriptionId;
+        keyHash = _keyHash;
     }
 
     function setCallbackGasLimit(
