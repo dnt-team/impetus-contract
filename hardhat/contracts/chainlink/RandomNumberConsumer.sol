@@ -21,7 +21,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
     }
     mapping(uint256 => RequestStatus)
         public s_requests;
-    mapping(uint256 => uint256) public block_to_request_id;
+    mapping(uint256 => uint256) public blockToRequestId;
     VRFCoordinatorV2Interface COORDINATOR;
 
     uint64 s_subscriptionId;
@@ -87,7 +87,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
         uint256 block_number,
         uint32 numWords
     ) external onlyOwner returns (uint256 requestId) {
-        require(block_to_request_id[block_number] == 0, "This block is requested");
+        require(blockToRequestId[block_number] == 0, "This block is requested");
 
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
@@ -104,7 +104,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
         });
         requestIds.push(requestId);
         lastRequestId = requestId;
-        block_to_request_id[block_number] = requestId;
+        blockToRequestId[block_number] = requestId;
         emit RequestSent(requestId, numWords, block_number);
         return requestId;
     }
